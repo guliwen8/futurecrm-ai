@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: futurecrm-ai
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:${FUTURECRM_DB:futurecrm-ai.db}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+futurecrm:
+  ai:
+    api-key: ${AI_API_KEY:${XIAOMI_API_KEY:${OPENAI_API_KEY:}}}
+    base-url: ${AI_BASE_URL:https://api.xiaomimimo.com/v1}
+    model: ${AI_MODEL:mimo-v2-flash}
+    api-style: ${AI_API_STYLE:chat-completions}

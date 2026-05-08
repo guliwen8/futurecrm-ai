@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FutureCRM AI</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main id="app">
+  <section class="login-view" id="loginView">
+    <div class="login-panel">
+      <p class="eyebrow">FutureCRM AI</p>
+      <h1>智能客户管理系统</h1>
+      <form id="loginForm">
+        <label>账号<input name="username" value="admin" autocomplete="username"></label>
+        <label>密码<input name="password" type="password" value="admin123" autocomplete="current-password"></label>
+        <button type="submit">登录</button>
+      </form>
+      <p id="loginError" class="error"></p>
+    </div>
+  </section>
+
+  <section class="shell hidden" id="mainView">
+    <aside class="sidebar">
+      <div class="brand">
+        <strong>FutureCRM AI</strong>
+        <span id="currentUser"></span>
+      </div>
+      <nav>
+        <button class="nav active" data-view="dashboard">仪表盘</button>
+        <button class="nav" data-view="customers">客户</button>
+        <button class="nav" data-view="orders">订单</button>
+        <button class="nav" data-view="assistant">AI 助手</button>
+      </nav>
+      <button class="ghost" id="logoutBtn">退出</button>
+    </aside>
+
+    <section class="content">
+      <section class="view" id="dashboard">
+        <header class="page-head">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2>今日经营概览</h2>
+          </div>
+          <button id="refreshDashboard">刷新</button>
+        </header>
+        <div class="metrics" id="metrics"></div>
+        <div class="split">
+          <section>
+            <h3>最近跟进</h3>
+            <div id="recentFollows" class="list"></div>
+          </section>
+          <section>
+            <h3>AI 今日建议</h3>
+            <div id="todayAdvice" class="list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view hidden" id="customers">
+        <header class="page-head">
+          <div>
+            <p class="eyebrow">Customers</p>
+            <h2>客户管理</h2>
+          </div>
+          <button id="newCustomerBtn">新增客户</button>
+        </header>
+        <div class="toolbar">
+          <input id="customerKeyword" placeholder="搜索客户、电话、行业">
+          <select id="customerStatus">
+            <option value="">全部状态</option>
+            <option value="POTENTIAL">潜在客户</option>
+            <option value="FOLLOWING">跟进中</option>
+            <option value="DEAL">已成交</option>
+            <option value="LOST">流失</option>
+          </select>
+          <button id="searchCustomers">搜索</button>
+        </div>
+        <div id="customerList" class="table-list"></div>
+      </section>
+
+      <section class="view hidden" id="orders">
+        <header class="page-head">
+          <div>
+            <p class="eyebrow">Orders</p>
+            <h2>销售订单</h2>
+          </div>
+          <button id="newOrderBtn">新增订单</button>
+        </header>
+        <div id="orderList" class="table-list"></div>
+      </section>
+
+      <section class="view hidden" id="assistant">
+        <header class="page-head">
+          <div>
+            <p class="eyebrow">AI Assistant</p>
+            <h2>经营问答</h2>
+          </div>
+        </header>
+        <div class="assistant-box">
+          <textarea id="aiQuestion" placeholder="例如：本周我应该优先跟进哪些客户？"></textarea>
+          <button id="askAiBtn">询问 AI</button>
+          <pre id="aiAnswer"></pre>
+        </div>
+      </section>
+    </section>
+  </section>
+
+  <dialog id="customerDialog">
+    <form method="dialog" class="dialog-form" id="customerForm">
+      <h3>客户信息</h3>
+      <input type="hidden" name="id">
+      <label>客户名称<input name="name" required></label>
+      <label>客户电话<input name="phone"></label>
+      <label>所属行业<input name="industry"></label>
+      <label>客户来源<input name="source"></label>
+      <label>客户等级<input name="grade"></label>
+      <label>客户状态
+        <select name="status">
+          <option value="POTENTIAL">潜在客户</option>
+          <option value="FOLLOWING">跟进中</option>
+          <option value="DEAL">已成交</option>
+          <option value="LOST">流失</option>
+        </select>
+      </label>
+      <label>成交阶段
+        <select name="stage">
+          <option value="INITIAL_CONTACT">初步接触</option>
+          <option value="NEEDS_CONFIRMED">需求确认</option>
+          <option value="PROPOSAL">方案报价</option>
+          <option value="NEGOTIATION">商务谈判</option>
+          <option value="CLOSED">成交</option>
+        </select>
+      </label>
+      <label>下次跟进时间<input name="next_follow_time" placeholder="2026-05-09 10:00"></label>
+      <label>备注<textarea name="remark"></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="cancelCustomer">取消</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="customerDetailDialog">
+    <section class="detail">
+      <header class="page-head">
+        <div>
+          <p class="eyebrow">Customer Detail</p>
+          <h2 id="detailTitle">客户详情</h2>
+        </div>
+        <button class="ghost" id="closeDetail">关闭</button>
+      </header>
+      <div class="detail-grid">
+        <section>
+          <h3>跟进记录</h3>
+          <form id="followForm" class="inline-form">
+            <input type="hidden" name="customer_id">
+            <textarea name="content" required placeholder="记录本次沟通内容"></textarea>
+            <input name="next_action" placeholder="下一步动作">
+            <input name="next_follow_time" placeholder="下次跟进时间">
+            <button type="submit">添加跟进</button>
+            <button type="button" class="ghost" id="summarizeFollow">AI 整理</button>
+          </form>
+          <div id="followList" class="list"></div>
+        </section>
+        <section>
+          <h3>AI 洞察</h3>
+          <div class="button-row">
+            <button id="profileAi">客户画像</button>
+            <button id="suggestAi">跟进建议</button>
+            <button id="scriptAi">销售话术</button>
+          </div>
+          <pre id="customerAiResult"></pre>
+        </section>
+      </div>
+    </section>
+  </dialog>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
