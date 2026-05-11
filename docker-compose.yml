@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  futurecrm-ai:
+    build: .
+    container_name: futurecrm-ai
+    ports:
+      - "8080:8080"
+    volumes:
+      - crm-data:/app/data
+    environment:
+      # AI configuration (optional — system runs without AI key)
+      - AI_API_KEY=${AI_API_KEY:-}
+      - AI_BASE_URL=${AI_BASE_URL:-https://api.xiaomimimo.com/v1}
+      - AI_MODEL=${AI_MODEL:-mimo-v2-flash}
+      - AI_API_STYLE=${AI_API_STYLE:-chat-completions}
+      # Database path
+      - FUTURECRM_DB=/app/data/futurecrm-ai.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  crm-data:
+    driver: local

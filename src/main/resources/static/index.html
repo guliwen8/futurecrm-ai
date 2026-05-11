@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FutureCRM AI</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f6feb'/><text x='16' y='23' text-anchor='middle' font-size='20' fill='white'>AI</text></svg>">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <main id="app">
+  <!-- ========== LOGIN ========== -->
   <section class="login-view" id="loginView">
     <div class="login-panel">
       <p class="eyebrow">FutureCRM AI</p>
@@ -21,6 +23,7 @@
     </div>
   </section>
 
+  <!-- ========== MAIN SHELL ========== -->
   <section class="shell hidden" id="mainView">
     <aside class="sidebar">
       <div class="brand">
@@ -31,109 +34,138 @@
         <button class="nav active" data-view="dashboard">仪表盘</button>
         <button class="nav" data-view="customers">客户</button>
         <button class="nav" data-view="orders">订单</button>
+        <button class="nav" data-view="receipts">收款</button>
         <button class="nav" data-view="assistant">AI 助手</button>
+        <button class="nav admin-only hidden" data-view="users">用户管理</button>
       </nav>
       <button class="ghost" id="logoutBtn">退出</button>
     </aside>
 
     <section class="content">
+
+      <!-- ===== DASHBOARD ===== -->
       <section class="view" id="dashboard">
         <header class="page-head">
-          <div>
-            <p class="eyebrow">Dashboard</p>
-            <h2>今日经营概览</h2>
-          </div>
+          <div><p class="eyebrow">Dashboard</p><h2>今日经营概览</h2></div>
           <button id="refreshDashboard">刷新</button>
         </header>
         <div class="metrics" id="metrics"></div>
         <div class="split">
-          <section>
-            <h3>最近跟进</h3>
-            <div id="recentFollows" class="list"></div>
-          </section>
-          <section>
-            <h3>AI 今日建议</h3>
-            <div id="todayAdvice" class="list"></div>
-          </section>
+          <section><h3>最近跟进</h3><div id="recentFollows" class="list"></div></section>
+          <section><h3>逾期收款</h3><div id="overdueReceipts" class="list"></div></section>
         </div>
+        <section style="margin-top:16px"><h3>AI 今日建议</h3><div id="todayAdvice" class="list"></div></section>
       </section>
 
+      <!-- ===== CUSTOMERS ===== -->
       <section class="view hidden" id="customers">
         <header class="page-head">
-          <div>
-            <p class="eyebrow">Customers</p>
-            <h2>客户管理</h2>
-          </div>
+          <div><p class="eyebrow">Customers</p><h2>客户管理</h2></div>
           <button id="newCustomerBtn">新增客户</button>
         </header>
         <div class="toolbar">
           <input id="customerKeyword" placeholder="搜索客户、电话、行业">
           <select id="customerStatus">
-            <option value="">全部状态</option>
-            <option value="POTENTIAL">潜在客户</option>
-            <option value="FOLLOWING">跟进中</option>
-            <option value="DEAL">已成交</option>
-            <option value="LOST">流失</option>
+            <option value="">全部状态</option><option value="POTENTIAL">潜在客户</option>
+            <option value="FOLLOWING">跟进中</option><option value="DEAL">已成交</option><option value="LOST">流失</option>
           </select>
           <button id="searchCustomers">搜索</button>
         </div>
         <div id="customerList" class="table-list"></div>
       </section>
 
+      <!-- ===== ORDERS ===== -->
       <section class="view hidden" id="orders">
         <header class="page-head">
-          <div>
-            <p class="eyebrow">Orders</p>
-            <h2>销售订单</h2>
-          </div>
+          <div><p class="eyebrow">Orders</p><h2>销售订单</h2></div>
           <button id="newOrderBtn">新增订单</button>
         </header>
+        <div class="toolbar">
+          <input id="orderKeyword" placeholder="搜索订单号、客户名">
+          <select id="orderStatus">
+            <option value="">全部状态</option><option value="DRAFT">草稿</option>
+            <option value="CONFIRMED">已确认</option><option value="IN_PROGRESS">执行中</option>
+            <option value="COMPLETED">已完成</option><option value="CANCELLED">已取消</option>
+          </select>
+          <button id="searchOrders">搜索</button>
+        </div>
         <div id="orderList" class="table-list"></div>
       </section>
 
+      <!-- ===== RECEIPTS ===== -->
+      <section class="view hidden" id="receipts">
+        <header class="page-head">
+          <div><p class="eyebrow">Receipts</p><h2>收款管理</h2></div>
+          <button id="newReceiptBtn">新增收款</button>
+        </header>
+        <div class="toolbar">
+          <select id="receiptStatus">
+            <option value="">全部状态</option><option value="UNPAID">未收款</option>
+            <option value="PARTIAL">部分收款</option><option value="PAID">已收款</option><option value="OVERDUE">逾期</option>
+          </select>
+          <button id="searchReceipts">筛选</button>
+        </div>
+        <div id="receiptList" class="table-list"></div>
+      </section>
+
+      <!-- ===== AI ASSISTANT ===== -->
       <section class="view hidden" id="assistant">
         <header class="page-head">
-          <div>
-            <p class="eyebrow">AI Assistant</p>
-            <h2>经营问答</h2>
-          </div>
+          <div><p class="eyebrow">AI Assistant</p><h2>经营问答</h2></div>
         </header>
         <div class="assistant-box">
-          <textarea id="aiQuestion" placeholder="例如：本周我应该优先跟进哪些客户？"></textarea>
+          <textarea id="aiQuestion" placeholder="例如：本周我应该优先跟进哪些客户？哪些订单存在收款风险？"></textarea>
           <button id="askAiBtn">询问 AI</button>
           <pre id="aiAnswer"></pre>
         </div>
       </section>
+
+      <!-- ===== USER MANAGEMENT ===== -->
+      <section class="view hidden" id="users">
+        <header class="page-head">
+          <div><p class="eyebrow">Users</p><h2>用户管理</h2></div>
+          <button id="newUserBtn">新增用户</button>
+        </header>
+        <div id="userList" class="table-list"></div>
+      </section>
+
     </section>
   </section>
 
+  <!-- ========== DIALOG: Customer Form ========== -->
   <dialog id="customerDialog">
     <form method="dialog" class="dialog-form" id="customerForm">
       <h3>客户信息</h3>
       <input type="hidden" name="id">
-      <label>客户名称<input name="name" required></label>
-      <label>客户电话<input name="phone"></label>
-      <label>所属行业<input name="industry"></label>
-      <label>客户来源<input name="source"></label>
-      <label>客户等级<input name="grade"></label>
-      <label>客户状态
-        <select name="status">
-          <option value="POTENTIAL">潜在客户</option>
-          <option value="FOLLOWING">跟进中</option>
-          <option value="DEAL">已成交</option>
-          <option value="LOST">流失</option>
-        </select>
-      </label>
-      <label>成交阶段
-        <select name="stage">
-          <option value="INITIAL_CONTACT">初步接触</option>
-          <option value="NEEDS_CONFIRMED">需求确认</option>
-          <option value="PROPOSAL">方案报价</option>
-          <option value="NEGOTIATION">商务谈判</option>
-          <option value="CLOSED">成交</option>
-        </select>
-      </label>
-      <label>下次跟进时间<input name="next_follow_time" placeholder="2026-05-09 10:00"></label>
+      <div class="form-cols">
+        <label>客户名称 *<input name="name" required></label>
+        <label>客户编号<input name="code"></label>
+        <label>客户等级<input name="grade"></label>
+        <label>客户来源<input name="source"></label>
+        <label>所属行业<input name="industry"></label>
+        <label>公司规模<input name="scale"></label>
+        <label>省份<input name="province"></label>
+        <label>城市<input name="city"></label>
+        <label>地址<input name="address"></label>
+        <label>电话<input name="phone"></label>
+        <label>邮箱<input name="email"></label>
+        <label>网站<input name="website"></label>
+        <label>客户状态
+          <select name="status">
+            <option value="POTENTIAL">潜在客户</option><option value="FOLLOWING">跟进中</option>
+            <option value="DEAL">已成交</option><option value="LOST">流失</option>
+          </select>
+        </label>
+        <label>成交阶段
+          <select name="stage">
+            <option value="INITIAL_CONTACT">初步接触</option><option value="NEEDS_CONFIRMED">需求确认</option>
+            <option value="PROPOSAL">方案报价</option><option value="NEGOTIATION">商务谈判</option>
+            <option value="CLOSED">成交</option><option value="MAINTENANCE">售后维护</option>
+          </select>
+        </label>
+        <label>所属销售 ID<input name="owner_user_id" type="number"></label>
+        <label>下次跟进时间<input name="next_follow_time" placeholder="2026-05-09 10:00"></label>
+      </div>
       <label>备注<textarea name="remark"></textarea></label>
       <div class="dialog-actions">
         <button type="button" class="ghost" id="cancelCustomer">取消</button>
@@ -142,40 +174,152 @@
     </form>
   </dialog>
 
+  <!-- ========== DIALOG: Customer Detail ========== -->
   <dialog id="customerDetailDialog">
     <section class="detail">
       <header class="page-head">
-        <div>
-          <p class="eyebrow">Customer Detail</p>
-          <h2 id="detailTitle">客户详情</h2>
-        </div>
+        <div><p class="eyebrow">Customer Detail</p><h2 id="detailTitle">客户详情</h2></div>
         <button class="ghost" id="closeDetail">关闭</button>
+      </header>
+      <div class="tabs" id="detailTabs">
+        <button class="tab active" data-tab="tab-follows">跟进记录</button>
+        <button class="tab" data-tab="tab-contacts">联系人</button>
+        <button class="tab" data-tab="tab-ai">AI 洞察</button>
+      </div>
+      <!-- Follow tab -->
+      <div class="tab-content" id="tab-follows">
+        <form id="followForm" class="inline-form">
+          <input type="hidden" name="customer_id"><input type="hidden" name="follow_id">
+          <textarea name="content" required placeholder="记录本次沟通内容"></textarea>
+          <input name="next_action" placeholder="下一步动作">
+          <input name="next_follow_time" placeholder="下次跟进时间">
+          <button type="submit">保存跟进</button>
+          <button type="button" class="ghost" id="cancelFollowEdit">取消编辑</button>
+          <button type="button" class="ghost" id="summarizeFollow">AI 整理</button>
+        </form>
+        <div id="followList" class="list"></div>
+      </div>
+      <!-- Contacts tab -->
+      <div class="tab-content hidden" id="tab-contacts">
+        <form id="contactForm" class="inline-form">
+          <input type="hidden" name="customer_id"><input type="hidden" name="contact_id">
+          <input name="name" required placeholder="姓名">
+          <input name="position" placeholder="职务">
+          <input name="mobile" placeholder="手机">
+          <input name="wechat" placeholder="微信">
+          <label class="checkbox-label"><input type="checkbox" name="is_decision_maker" value="1"> 关键决策人</label>
+          <button type="submit">保存联系人</button>
+          <button type="button" class="ghost" id="cancelContactEdit">取消编辑</button>
+        </form>
+        <div id="contactList" class="list"></div>
+      </div>
+      <!-- AI tab -->
+      <div class="tab-content hidden" id="tab-ai">
+        <div class="button-row">
+          <button id="profileAi">客户画像</button>
+          <button id="suggestAi">跟进建议</button>
+          <button id="scriptAi">销售话术</button>
+        </div>
+        <pre id="customerAiResult"></pre>
+      </div>
+    </section>
+  </dialog>
+
+  <!-- ========== DIALOG: Order Form ========== -->
+  <dialog id="orderDialog">
+    <form method="dialog" class="dialog-form" id="orderForm">
+      <h3>销售订单</h3>
+      <input type="hidden" name="id">
+      <div class="form-cols">
+        <label>订单编号<input name="order_no"></label>
+        <label>客户 *<input name="customer_id" type="number" required></label>
+        <label>联系人 ID<input name="contact_id" type="number"></label>
+        <label>订单日期<input name="order_date" type="date"></label>
+        <label>订单金额<input name="amount" type="number" step="0.01"></label>
+        <label>已收金额<input name="paid_amount" type="number" step="0.01"></label>
+        <label>订单状态
+          <select name="status">
+            <option value="DRAFT">草稿</option><option value="CONFIRMED">已确认</option>
+            <option value="IN_PROGRESS">执行中</option><option value="COMPLETED">已完成</option><option value="CANCELLED">已取消</option>
+          </select>
+        </label>
+        <label>送货地址<input name="delivery_address"></label>
+      </div>
+      <label>备注<textarea name="remark"></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="cancelOrder">取消</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ========== DIALOG: Order Detail ========== -->
+  <dialog id="orderDetailDialog">
+    <section class="detail">
+      <header class="page-head">
+        <div><p class="eyebrow">Order Detail</p><h2 id="orderDetailTitle">订单详情</h2></div>
+        <button class="ghost" id="closeOrderDetail">关闭</button>
       </header>
       <div class="detail-grid">
         <section>
-          <h3>跟进记录</h3>
-          <form id="followForm" class="inline-form">
-            <input type="hidden" name="customer_id">
-            <textarea name="content" required placeholder="记录本次沟通内容"></textarea>
-            <input name="next_action" placeholder="下一步动作">
-            <input name="next_follow_time" placeholder="下次跟进时间">
-            <button type="submit">添加跟进</button>
-            <button type="button" class="ghost" id="summarizeFollow">AI 整理</button>
-          </form>
-          <div id="followList" class="list"></div>
+          <h3>订单信息</h3>
+          <div id="orderInfo" class="list"></div>
         </section>
         <section>
-          <h3>AI 洞察</h3>
-          <div class="button-row">
-            <button id="profileAi">客户画像</button>
-            <button id="suggestAi">跟进建议</button>
-            <button id="scriptAi">销售话术</button>
-          </div>
-          <pre id="customerAiResult"></pre>
+          <h3>AI 风险检查</h3>
+          <button id="orderRiskBtn">检查订单风险</button>
+          <pre id="orderRiskResult"></pre>
         </section>
       </div>
     </section>
   </dialog>
+
+  <!-- ========== DIALOG: Receipt Form ========== -->
+  <dialog id="receiptDialog">
+    <form method="dialog" class="dialog-form" id="receiptForm">
+      <h3>收款记录</h3>
+      <input type="hidden" name="id">
+      <div class="form-cols">
+        <label>客户 *<input name="customer_id" type="number" required></label>
+        <label>关联订单 ID<input name="order_id" type="number"></label>
+        <label>应收金额<input name="receivable_amount" type="number" step="0.01"></label>
+        <label>实收金额<input name="received_amount" type="number" step="0.01"></label>
+        <label>预计收款日期<input name="expected_date" type="date"></label>
+        <label>实际收款日期<input name="received_date" type="date"></label>
+      </div>
+      <label>备注<textarea name="remark"></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="cancelReceipt">取消</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ========== DIALOG: User Form ========== -->
+  <dialog id="userDialog">
+    <form method="dialog" class="dialog-form" id="userForm">
+      <h3>用户信息</h3>
+      <input type="hidden" name="id">
+      <div class="form-cols">
+        <label>用户名 *<input name="username" required></label>
+        <label>姓名 *<input name="real_name" required></label>
+        <label>邮箱<input name="email"></label>
+        <label>电话<input name="phone"></label>
+        <label>角色
+          <select name="role">
+            <option value="SALES">销售</option><option value="MANAGER">管理者</option>
+            <option value="FINANCE">财务</option><option value="ADMIN">管理员</option>
+          </select>
+        </label>
+        <label>密码（留空为默认123456）<input name="password" type="password"></label>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="cancelUser">取消</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
 </main>
 <script src="/app.js"></script>
 </body>
